@@ -1555,14 +1555,20 @@ GNEApplicationWindow::updateRecomputingLabel() {
 
 void
 GNEApplicationWindow::closeAllWindows() {
+    // first check if net must be deleted
+    if (myNet != nullptr) {
+        delete myNet;
+        myNet = nullptr;
+        GeoConvHelper::resetLoaded();
+    }
     // check if view has to be saved
     if (myViewNet) {
         myViewNet->saveVisualizationSettings();
+        // clear decals
         myViewNet->getDecals().clear();
     }
     // lock tracker
     myTrackerLock.lock();
-    // clear decals
     // remove trackers and other external windows
     while (!myGLWindows.empty()) {
         delete myGLWindows.front();
@@ -1582,12 +1588,6 @@ GNEApplicationWindow::closeAllWindows() {
     myCartesianCoordinate->setText(TL("N/A"));
     myTestCoordinate->setText(TL("N/A"));
     myTestFrame->hide();
-    // check if net can be deleted
-    if (myNet != nullptr) {
-        delete myNet;
-        myNet = nullptr;
-        GeoConvHelper::resetLoaded();
-    }
     myMessageWindow->unregisterMsgHandlers();
     // Reset textures
     GUITextureSubSys::resetTextures();
